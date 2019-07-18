@@ -13,6 +13,12 @@
 \usepackage{subcaption}
 \usepackage{tikz}
 
+\usepackage{hyperref}
+\hypersetup{
+colorlinks=true,
+linkcolor=magenta
+}
+
 %%% Дополнительная работа с математикой
 \usepackage{amsmath,amsfonts,amssymb,amsthm,mathtools} % AMS
 \usepackage{icomma} % "Умная" запятая: $0,2$ --- число, $0, 2$ --- перечисление
@@ -22,6 +28,7 @@
 \usepackage{mathrsfs} % Красивый матшрифт
 
 \title{Сюжеты с кружка по эконометрике}
+\author{Последнее обновление:}
 
 \usepackage{geometry}
 \geometry{
@@ -39,6 +46,8 @@
 \begin{document}
 	
 \maketitle
+
+\tableofcontents
 
 \section{Идеи распределений}
 
@@ -506,12 +515,497 @@ n \dfrac{f'(a)}{f(a)} + \dfrac{f'(-na)}{f(-na)} = 0 \text{ } \forall n, a.
 f(x) = C_1e^{\dfrac{kx^2}{2}}.
 \]
 
-\section{Лайфхаки}
+\subsection{Распределения через максимальную энтропию}
+
+\hyperlink{entropy}{Отступление: про энтропию.}
+
+\begin{enumerate}
+	\item $\E(y) = 10$, $\sigma = 1$, $H(y) \rightarrow \max \Rightarrow y \sim N(0,1)$.
+	\item $y \ge 0$, $\E(y) = 5$, $H(y) \rightarrow \max \Rightarrow y \sim Exp(0)$.
+	\item $y \in [a, b]$, $H(y) \rightarrow \max \Rightarrow y \sim U[a, b]$.
+\end{enumerate}
+
+Интересный вопрос: что больше: $D_{KL}(N(0,1) || U[0, 1])$ или $D_{KL}(U[0,1] || N(0, 1)$? Посмотрим по смыслу: в перовом случае мы выбираем число из нормального распределения, а задаём вопросы про числа из равномерного распределения. Значит, существует положительная вероятность, что мы выберем такое число из нормального распределения, которое не накрывается равномерным, то есть, мы можем никогда не угадать это число. Это означает, что $D_{KL}(N || U) = +\infty$. Во втором же случае наоборот: загадали из равномерного, а спрашиваем про нормальное, то есть рано или поздно число будет угадано. Это означает, что  $D_{KL}(U || N) = $ большое, но конечное число. То есть $D_{KL}(U || N) < D_{KL}(N || U)$. 
+
+\subsubsection{Нормальное распределение (через максимальную энтропию)}
+
+Пусть $X \sim N(\mu, \sigma^2)$, $\E(y) = \mu$, $Var(y) = \sigma^2$. Тогда $H(x) \ge H(y)$. Покажем это.
+
+\begin{align*}
+	H(X) = \int_{-\infty}^{+\infty}\dfrac{1}{\sqrt{2\pi \sigma^2}}e^{-\frac{1}{2}\frac{(x-\mu)^2}{\sigma^2}} \log_{\frac{1}{2}} \dfrac{1}{\sqrt{2\pi \sigma^2}}e^{-\frac{1}{2}\frac{(x-\mu)^2}{\sigma^2}}dx.
+\end{align*}
+Для краткости:
+\[
+H(X) = \int f(x) \log_{\frac{1}{2}} f(x)dx.
+\]
+Для удобства перейдём в наты. Напоминание:
+\[
+\log_{\frac{1}{2}}x \times \log_{e}\frac{1}{2} = \ln x.
+\]
+\[
+\ln \frac{1}{2} < 0.
+\]
+Тогда:
+\[
+H(X) = -\int f(x) \ln f(x)dx.
+\]
+Раскроем вторые скобки:
+\begin{align*}
+	H(X) = -\int f(x) \left( \ln \dfrac{1}{\sqrt{2\pi\sigma^2}} - \dfrac{1}{2}\dfrac{(x-\mu)^2}{\sigma^2} \right)dx.
+\end{align*}
+Знаем, что:
+\begin{align*}
+	Var(X) = \E(X-\mu)^2 = \int f(x)(x-\mu)^2dx.
+\end{align*}
+А это как раз второй член в скобках. Получается, что числитель при взятии интеграла обратится в диспресию $X$ и сократится со знаменателем. Получаем:
+\[
+H(X) = - \left( \ln \dfrac{1}{\sqrt{2\pi\sigma^2}} - \dfrac{1}{2} \right) = \dfrac{1}{2} \left(1 + \ln(2\pi\sigma^2)\right).
+\]
+
+Пусть $Y \sim q$. Тогда:
+\[
+CE(Y||X) = -\int q(x) \left( \ln \dfrac{1}{\sqrt{2\pi\sigma^2}} - \dfrac{1}{2}\dfrac{(x-\mu)^2}{\sigma^2} \right)dx = \dfrac{1}{2} \left(1 + \ln(2\pi\sigma^2)\right).
+\]
+Получили, что:
+\[
+H(X) = CE(Y||X) \ge H(Y) \text{ (доказано ниже).}
+\]
+
+\subsubsection{Экспоненциальное распределение (через максимальную энтропию)}
+
+Докажем, что если $\E(X) = 1/\lambda$ и $X \ge 0$, то $H(X)$ максимальна при $X \sim exp(\frac{1}{\lambda})$.
+
+Аналогично нормальному распределению:
+\[
+H(X) = - \int_{0}^{+\infty} f(x)(\ln\lambda - \lambda x)dx = -(\ln \lambda - 1) = 1 - \ln \lambda.
+\]
+\[
+CE(Y||X) = - \int_{0}^{+\infty} q(x)(\ln\lambda - \lambda x)dx = -(\ln \lambda - 1) = 1 - \ln \lambda.
+\]
+\[
+H(X) = CE(Y||X) \ge H(Y).
+\]
+
+\hypertarget{entropy}{}
+\section{Энтропия}
+Рассмотрим игру. Пусть мы загадываем один из четырёх вариантов со следующими вероятностями:
+
+\begin{center}
+	\bgroup
+	\def\arraystretch{1.5}
+	\hspace*{-1.2cm}\begin{tabular}{ c| c c c c}
+		$Y$ & Пуассон & Фишер & Коши & Арбуз \\
+		\hline
+		Prob. & 1/2 & 1/4 & 1/8 & 1/8
+	\end{tabular}
+	\egroup
+\end{center}
+
+Нужно найти, какое среднее число бинарных вопросов нужно задать, чтобы угадать $Y$, используя \textit{оптимальную стратегию}. 
+
+Логично, что при данном распределении вероятностей сначала уместно задать вопрос: <<Это Пуассон?>>, потому что Пуассон загадывается наиболее вероятно. Если это Пуассон, ты игра оканчивается, если нет -- то следующим вопросом узнаём, Фишер ли это. Если же это и не Фишер, то можем спросить либо про Коши, либо про арбуз, и после этого точно завершить игру. Посмотрим, какое минимальное количество вопросов нужно задать в лучшем случае, чтобы отгадать каждый вариант, используя оптимальную стратегию:
+
+\begin{center}
+	\bgroup
+	\def\arraystretch{1.5}
+	\hspace*{-1.2cm}\begin{tabular}{c c c}
+		$Y$ & Prob. & Q \\
+		\hline
+		Пуассон & 1/2 & 1 \\
+		Фишер & 1/4 & 2 \\
+		Коши & 1/8 & 3 \\
+		Арбуз & 1/8 & 3 \\
+	\end{tabular}
+	\egroup
+\end{center}
+
+Заметим, что $Q = \log_{\frac{1}{2}}\text{Prob.}$ Найдём матожидание $Q$:
+\[
+\E(Q) = \sum \P(Y = y_i)\times \log_{\frac{1}{2}}\P(Y = y_i).
+\]
+
+Это матожидание и есть энтропия. По смыслу, энтропия показывает среднее число бинарных вопросов, которые нужно задать при использовании оптимальной стратегии, чтобы завершить игру. Обозначение: $H(y)$, $H(p)$.
+
+Теперь рассмотрим кросс-энтропию (из одного распределения в другое). Для этого вернёмся к нашей игре и будем считать, что вероятности, которые мы рассматривали до этого, -- это истинное распределение вероятностей $A$. Также считаем, что это истинное распределение нам неизвестно, и свою стратегию отгадывания мы будем строить по другому распределению, $B$:
+
+\begin{center}
+	\bgroup
+	\def\arraystretch{1.5}
+	\hspace*{-1.2cm}\begin{tabular}{ c| c c c c}
+		$Y$ & Пуассон & Фишер & Коши & Арбуз \\
+		\hline
+		$A$ & 1/2 & 1/4 & 1/8 & 1/8 \\
+		$B$ & 1/4 & 1/2 & 1/8 & 1/8
+	\end{tabular}
+	\egroup
+\end{center}
+
+Так как мы строим стратегию по распределению $B$, то сначала уместно задать вопрос по Фишера и только затем про Пуассона. Соответственно, минимальное количество задаваемых вопросов так же изменится:
+
+\begin{center}
+	\bgroup
+	\def\arraystretch{1.5}
+	\hspace*{-1.2cm}\begin{tabular}{c c c}
+		$Y$ & Prob. (по $A$) & Q (по $B$) \\
+		\hline
+		Фишер & 1/4 & 1 \\
+		Пуассон & 1/2 & 2 \\
+		Коши & 1/8 & 3 \\
+		Арбуз & 1/8 & 3 \\
+	\end{tabular}
+	\egroup
+\end{center}
+
+Таким образом, изменится и матожидание $Q$, то есть энтропия. Теперь это матожидание называется кросс-энтропией из $A$ в $B$. По смыслу: кросс-энтропия показывает среднее число бинарных вопросов, которое, как мы считаем в соответствии с распределением $B$, нужно задать при использовании оптимальной стратегии, чтобы завершить игру, истинное распределение вероятностей которой -- $A$. Обозначение: $CE(a || b)$, $Ha(b)$. Понятно, что $H(a) = CE(a || a)$. То есть:
+\[
+CE(A||B) = \sum \P_A(Y = y_i)\times \log_{\frac{1}{2}}\P_B(Y = y_i).
+\]
+
+Рассчитаем энтропию и кросс-энтропию для нашей игры.
+\[
+H(A) = \dfrac{1}{2} \times 1 + \dfrac{1}{3} \times 2 + 2 \times 3 \times \dfrac{1}{8} = 1\dfrac{3}{4}.
+\]
+\[
+CE(A||B) = \dfrac{1}{4} \times 1 + \dfrac{1}{2} \times 2 + 2 \times 3 \times \dfrac{1}{8} = 2.
+\]
+
+Получили, что $CE(a||b) > H(a)$. Совпадение ли это? Прежде чем выяснить это, введём следующую величину.
+
+\textbf{Дивергенция Куйбака-Лейблера} показывает, насколько в среднем больше вопросов потребуется задать, чем могли бы при использовании оптимальной стратегии. По смыслу, это некоторая мера потери. Обозначение:
+\[
+D_{KL}(a||b) = CE(a||b) - H(a).
+\]
+
+\textbf{Теорема:}
+\[
+CE(a||b) \ge CE(a||a),
+\]
+\[
+D_{KL}(a||b) \ge 0.
+\]
+\textbf{Доказательство:}
+Построив графики $y=x-1$ и $y=\ln x$, можно убедиться, что $x-1 \ge \ln x$. Подставим $x = \dfrac{a_i}{b_i}$. Получаем:
+\begin{align*}
+	\dfrac{a_i}{b_i} - 1 &e\ge \ln\dfrac{a_i}{b_i} \\
+	\sum(a_i - b_i)&\ge \sum(b_i\ln a_i - b_i \ln b_i).
+\end{align*}
+
+Так как $A$ и $B$ -- распределения вероятностей, слева стоит разность $1 - 1 = 0$. Получаем:
+\[
+\sum(b_i\ln a_i) - \sum(b_i \ln b_i) \le 0.
+\]
+Перейдём от натуральных логарифмов к логарифмам с основанем $\dfrac{1}{2}$. Для этого домножим обе части неравенства на $\log_{\frac{1}{2}}e$, потому что:
+\[
+\log_e a \times \log_{\frac{1}{2}}e = \log_{\frac{1}{2}}e^{log_e a} = \log_{\frac{1}{2}}a.
+\]
+Тогда получим:
+\[
+\sum(b_i  \log_{\frac{1}{2}} a_i) - \sum(b_i  \log_{\frac{1}{2}} b_i) \ge 0,
+\]
+так как $ \log_{\frac{1}{2}}e < 0$. Таким образом,
+\[
+\sum(b_i  \log_{\frac{1}{2}} a_i) \ge \sum(b_i  \log_{\frac{1}{2}} b_i)
+\]
+\[
+CE(b||a) \ge CE(b||b).
+\]
+
+В непрерывном случае всё сохраняется, но все суммы заменяются на интегралы. Энтропия в непрерывном случае плохо интерпретируется. Например:
+\begin{align*}
+D_{KL}(a||b) = \int_{-\infty}^{+\infty}a\log(b) dt - \int_{-\infty}^{+\infty}a\log(a) dt = \int_{-\infty}^{+\infty}a\log (\dfrac{b}{a}) dt.
+\end{align*}
+
+В дискретном случае, скорее, хотим минимизировать энтропию, а в непрерывном -- $D_{KL}$.
+
+Пример из Variational Bayes. Имеется апостериорное распределение $P(\theta|y)$, хитрое и странное. Возьмём другое распределение, $q(\theta)$, так, чтобы оно было простым и было похоже на апостериорное. Предположим, что:
+\[
+q(\theta) = q_1(\theta_1) \times q_2(\theta_2).
+\] 
+\[
+\theta_1 \sim N(\mu_1, \sigma_1^2).
+\]
+\[
+\theta_2 \sim N(\mu_2, \sigma_2^2).
+\]
+
+Что проще минимизировать по $q$ (ответ в разделе про VB):
+\begin{enumerate}
+	\item $D_{KL}(q||p) = \int q \ln \dfrac{p}{q}dt$.
+	\item $D_{KL}(p||q) = \int p \ln \dfrac{q}{p}dt$.
+\end{enumerate}
+
+
+\section{Тета-метод}
+
+Тета-метод -- частный случай ETS(AAN), поэтому он не подходит для анализа сезонных рядов. Напоминание: ETS(AAN):
+\[
+\varepsilon \sim N(0, \sigma^2)
+\]
+\[
+\begin{cases}
+	y_t = l_{t-1} + b_{t-1} + \varepsilon_t, \\
+	l_t =  l_{t-1} + b_{t-1} + \alpha\varepsilon_t, \\
+	b_t = b_{t-1} + \beta\varepsilon_t.
+\end{cases}
+\]
+ML: $\alpha$, $\beta$, $\sigma^2$, $l_0$, $b_0$.
+
+Тета-метод: $\beta = 0$, $l_1 = y_1$ (положим линию долгосрочного уровня так, чтобы было попадание на первое наблюдение). Следовательно:
+\begin{align*}
+	y_t &= l_{t-1} + b + \varepsilon_t. \\
+	l_t &= l_{t-1} + b + \alpha\varepsilon_t. \\
+	b_t &= b_0 = b. \\
+	y_1 &= b_1 = b.
+\end{align*}
+Тогда:
+\begin{align*}
+\Delta y_t &= \Delta l_{t-1} + \Delta b + \Delta \varepsilon_t. \\
+\Delta y_t &= b + \alpha \varepsilon_{t-1} + \varepsilon_t - \varepsilon_{t-1}. \\
+\Delta y_t &= b + \varepsilon_t + (\alpha - 1)\varepsilon_{t-1}.
+\end{align*}
+А это ARIMA(0, 1, 1).
+
+Тета-метод получается лучше, чем ETS-AAN.
+
+\section{Байесовский подход}
+
+Задача:
+\begin{enumerate}
+	\item Данные: $y_1 = 3$, $y_2 = 5$.
+	\item Модель: $y_i \sim N(\mu, \dfrac{1}{\tau})$ и независимы. 
+	\item Априорное мнение о $\mu$ и $\tau$: $\tau \sim \gamma(2, 7)$, $\mu | \tau \sim N(1, \dfrac{2}{\tau})$.
+\end{enumerate}
+
+Нужно найти апостериорное распределение $f(\mu, \tau | y)$:
+\begin{enumerate}
+	\item[a)] Явно: N-IG (нормальное обратное гамма, нормальное обратное Уишарта): $\sigma^2 \sim IG$, $\mu | \sigma^2 \sim N$.
+	\item[b)] Описать явно алгоритм MH-RW.
+	\item[c)] Описать VB (вариационный Байес).
+\end{enumerate}
+
+\subsection{Явно (N-IG)}
+
+Априорное распределение:
+\[
+f(\tau) = Ce^{-7\tau}\tau^{2-1} \propto e^{-7\tau}\tau.
+\]
+\[
+f(\mu | \tau) = \dfrac{1}{\sqrt{2\pi\frac{2}{\tau}}}e^{-\frac{1}{2}(\mu - 1)^2\frac{\tau}{2}}.
+\]
+
+Модель:
+\[
+f(y_i | \mu, \tau) = \dfrac{1}{\sqrt{2\pi \frac{1}{\tau}}}e^{-\frac{1}{2}(y_i - \mu)^2\tau}.
+\]
+
+Тогда выводим апостериорное распределение:
+\begin{align*}
+	f(\mu, \tau | y_1, y_2) = \dfrac{f(\mu, \tau, y_1, y_2)}{f(y_1, y_2)} \propto f(\mu, \tau, y_1, y_2) = f(\mu, \tau)f(y_1, y_2|\mu, \tau) =\\= [\text{априорное распределение}\times\text{функция правдоподобия}] = f(\tau)f(\mu|\tau)f(y_1|\mu, \tau)f(y_2|\mu, \tau) \propto \\ \propto
+	\tau e^{-7\tau}\sqrt{\tau}e^{-\frac{1}{2}(\mu - 1)^2\frac{\tau}{2}}\sqrt{\tau}e^{-\frac{1}{2}(3 - \mu)^2\tau}\sqrt{\tau}e^{-\frac{1}{2}(5 - \mu)^2\tau} \propto \tau^{2.5}e^{-7\tau} e^{-\frac{1}{2}\tau (\frac{(\mu-1)^2}{2})+(\mu-3)^2+(\mu-5)^2} = \\ =
+	\tau^{2.5}e^{-7\tau}e^{-\frac{1}{2}\tau(2.5\mu^2 - 17\mu + 34.5)} = \tau^{2.5}e^{-7\tau}e^{-\frac{1}{2}2.5\tau((\mu - \frac{17}{5})^2 + (\frac{69}{5}-(\frac{17}{5})^2))} \propto \underbrace{\tau^{2.5}e^{-7\tau-\frac{\tau}{4}(69 - \frac{17^2}{5})}}_{\gamma(2.5-0.5+1;\text{ } 7 + \frac{69 - \frac{17^2}{5}}{4})} \times \underbrace{\underbrace{C}_{\frac{1}{\sqrt{2\pi}}\frac{1}{\sqrt{\frac{1}{2.5\tau}}}}e^{-\frac{1}{2}2.5\tau(\mu - \frac{17}{5})^2}}_{N(\frac{17}{5}; \frac{1}{2.5\tau})}.
+\end{align*}
+
+В итоге, снова получили NIG. Было: 
+\begin{align*}
+	\tau &\sim \gamma(a, b). \\
+	\mu | \tau &\sim N(\mu_0, \frac{k}{\tau}), \\
+	y_1 &\dots y_n.
+\end{align*}
+Стало:
+\begin{align*}
+	\tau | y_1, y_2 &\sim \gamma(a^*, b^*), \\
+	\mu | \tau, y_1, y_2 &\sim N(\mu_0^*, \dfrac{k^*}{\tau}), \\
+\end{align*}
+
+Параметры априорного распределения можно восстановить в общем виде, например:
+\[
+a^* = a + \dfrac{n}{2},
+\]
+потому что к изначальному $a-1$ в степени $\tau$ придёт $n\times 0.5$ из функций плотности $y_i$ и $0.5$ из функции плотности $\mu$, а в конце нужно вычесть одну $0.5$ и прибавить $1$ для восстановления константы нормального распределения. Получаем, что $a^* = a - 1 + 0.5n + 0.5 - 0.5 + 1$.
+
+\subsection{MH-RW}
+
+Цель -- получить набор $\left( \mu^{[1]},\tau^{[1]}  \right)$, $\left( \mu^{[2]},\tau^{[2]}  \right)$, $\left( \mu^{[3]},\tau^{[3]}  \right)$, $\ldots$ Вопрос -- как это сделать.
+
+\begin{description}
+	\item[Шаг 1:] Генерируем случайно $\tau^{[1]} \sim f(\tau)$. Получаем $\mu^{[1]}$. В нашем случае: 
+	\begin{align*}
+	\tau^{[1]} &\sim \gamma(2, 7), \\
+	\mu^{[1]} &\sim N(1, \frac{2}{\tau^{[1]}}).
+	\end{align*}
+	
+	\item[Шаг 2:] Сочиняем предложение:
+	\begin{align*}
+		\tau^{[\text{prop}]} &= \tau^{[1]} + N(0; 4), \\
+		\mu^{[\text{prop}]} &= \mu^{[1]} + N(0; 1).
+	\end{align*}
+	Прибавляемые распределения -- вопрос настройки алгоритма.
+	
+	\item[Шаг 3:] С некоторой вероятностью предложение одобряется, и тогда $\tau^{[2]} = \tau^{[\text{prop}]}$, $\mu^{[2]} = \mu^{[\text{prop}]}$, а затем переходим к шагу 2. Если предложение не одобряется, то просто переходим к шагу 2.
+	
+\end{description}
+Как получить вероятность перехода?
+
+\textbf{Основная идея:} если $\theta^{[n]}$ ($\theta = (\mu, \tau)$) уже генерируется из $f(\theta | y_1, y_2)$, то \textbf{не портить!}
+
+Достаточное условие:
+\[
+s(\theta_A \rightarrow \theta_B) = s(\theta_B \rightarrow \theta_A),
+\]
+то есть количество переходов из $A$ в $B$ за единицу времени равно количеству переходов из $B$ в $A$ за единицу времени.
+
+Распишем это условие в плотностях:
+\begin{align*}
+	f(\theta_A|y) \times f_{N(0,1)}(\mu_B - \mu_A)\times f_{N(0,4)}(\tau_B - \tau_A)\times\alpha(\theta_A \rightarrow \theta_B) =\\= f(\theta_B|y) \times f_{N(0,1)}(\mu_A - \mu_B)\times f_{N(0,4)}(\tau_A - \tau_B)\times\alpha(\theta_B \rightarrow \theta_A),
+\end{align*}
+
+где $\alpha(\cdot)$ -- вероятность одобрения перехода, указанного в скобках. Функции плотности нормального распределения сокращаются, и получаем следующее условие:
+\[
+\dfrac{\alpha(\theta_B \rightarrow \theta_A)}{\alpha(\theta_A \rightarrow \theta_B)} = \dfrac{f(\theta_A|y)}{f(\theta_B|y)}.
+\]
+
+А $f(\theta_A|y)$ и $f(\theta_B|y)$ знаем из пункта а): 
+\begin{align*}
+f(\theta_A|y) = f(\mu_A, \theta_A|y_1, y_2), \\
+f(\theta_B|y) = f(\mu_B, \theta_B|y_1, y_2).
+\end{align*}
+
+Пример: $f(\theta_A|y) = 0.0012$, $f(\theta_B|y) = 0.0036$. Тогда, например, $\alpha(\theta_A \rightarrow \theta_B) = 1$, $\alpha(\theta_B \rightarrow \theta_A) = \dfrac{1}{3}$. Для вероятностей одобрения можно взять и другие числа (например, $\dfrac{1}{5}$ и $\dfrac{1}{15}$), но не берут, так как сходимость дольше (3 предложения на один шаг против 15 предложений на один шаг).
+
+В компьютере хранятся не сами функции плотности, а их логарифмы, чтобы не было выхода за размеры хранения чисел. Тогда:
+\[
+\ln\alpha(\theta_B \rightarrow \theta_A) - \ln\alpha(\theta_A \rightarrow \theta_B) = \ln f(\theta_A|y) - \ln f(\theta_B|y).
+\]
+
+\subsection{Вариационный Байес}
+
+Явный алгоритм -- точный, на конечной выборке -- примерный. MH-RW -- асимптотически точный. VB -- примерный. То есть через VB получаем распределение, похожее на апостериорное, но сколько ни жди, точным он не будет.
+
+Идея:
+\begin{align*}
+	&f(\mu, \tau | y), \\
+	\tau | y &\sim \gamma(\ldots), \\
+	\mu | \tau, y &\sim N(\ldots),
+\end{align*}
+$\mu$ и $\tau$ зависимы.
+
+Чаще всего: $q(\mu, \tau) = q(\mu)q(\tau)$.
+Приближаем распределениями: $\mu \sim N(?; ?)$, $\tau \sim N(?; ?)$, параметры которых надо подобрать.
+\begin{align*}
+	D_{KL}(q||f(\theta|y)) \ge 0, \\
+	D_{KL}(f(\theta|y)||q) \ge 0. 
+\end{align*}
+
+Что проще минимизировать по $q$:
+\begin{enumerate}
+	\item $D_{KL}(q||f(\theta|y)) = \int_{\theta} \underbrace{q(\theta)}_{\text{простая}} \ln \dfrac{f(\theta|y)}{q(\theta)}d\theta$.
+	\item $D_{KL}(f(\theta|y)||q) = \int_{\theta} \underbrace{f(\theta|y)}_{\text{адская}} \ln \dfrac{q(\theta)}{f(\theta|y)}d\theta$.
+\end{enumerate}
+
+Вывод: по $q$ легче минимизировать первую функцию. Упростим далее:
+\begin{align*}
+	\int_{\theta} q(\theta) \ln \dfrac{f(\theta|y)}{q(\theta)}d\theta = \int_{\theta} q(\theta) \ln \dfrac{f(\theta,y)}{q(\theta)}d\theta - \int_{\theta} q(\theta)\ln f(y)d\theta = \int_{\theta} q(\theta) \ln \dfrac{f(\theta,y)}{q(\theta)}d\theta - \ln f(y).
+\end{align*}
+
+Получается, что минимизировать нужно только уменьшаемое:
+\[
+\int_{\theta} q(\theta) \ln \dfrac{f(\theta,y)}{q(\theta)}d\theta = \int_{\theta} q(\mu)q(\tau) \ln \dfrac{f(\theta,y)}{q(\theta)}d\theta \rightarrow \min_{q}.
+\]
+
+Процедура VB с высоты птичьего полёта:
+\begin{description}
+	\item[Шаг 1:] Подбираем $q_1(\mu)$, чтобы $\min \int_{\theta} q(\theta) \ln \dfrac{f(\theta,y)}{q(\theta)}d\theta$.
+	
+	\item[Шаг 2:] Подбираем $q_2(\tau)$, чтобы $\min \int_{\theta} q(\theta) \ln \dfrac{f(\theta,y)}{q(\theta)}d\theta$. Далее переходим к шагу 1.
+\end{description}
+
+Как подбирать? Сделаем вспомогательное упражнение. В $\int_{\theta} q(\theta) \ln \dfrac{f(\theta,y)}{q(\theta)}d\theta$ выделить часть, которая зависит от $q_1$. 
+\begin{align*}
+	\iint q_1(\mu)q_2(\tau) \ln \dfrac{f(\mu, \tau, y)}{q_1(\mu)q_2(\tau)}d\mu d\tau =\\= \iint q_1(\mu) q_2(\tau) \ln f(\mu, \tau, y)d\mu d\tau - \iint q_1(\mu)q_2(\tau)\ln q_1(\mu) d\mu d\tau - \iint q_1(\mu)q_2(\tau)\ln q_2(\tau) d\mu d\tau.
+\end{align*}
+
+Помня, что минимизируем по $q_1$, видим, что последний член -- это константа, так как $q_1$ интегрируется в 1, а остальное не зависит от $q_1$. В двух первых членах вынесем $q_2(\tau)$ за знак внутреннего интеграла и скомбинируем. Получаем:
+\[
+\int q_2(\tau) \int q_1(\mu)(\ln f(\mu, \tau, y) - \ln q_1(\mu))d\mu d\tau.
+\]
+
+Как это минимизировать по $q$? \hyperlink{euler}{Отступление: уравнение Эйлера.}
+
+<Продолжение следует>
+
+\hypertarget{euler}{}
+\section{Уравнение Эйлера}
+\[
+\int_{0}^{1} g(y, \dot{y}, t)dt \rightarrow \max_y.
+\]
+
+Пример:
+\[
+\int_{0}^{1} (\dot{y} - 7)^2 dt \rightarrow \min_y.
+\]
+
+Понятно, что $y(t) = 7t + k$.
+
+Рассмотрим возмущения нашей функции:
+\[
+y(t) + \delta v(t) = \tilde{y}(t),
+\]
+где $\delta$ -- число, а $v(t)$ -- возмущение. Тогда:
+\[
+\dot{\tilde{y}}(t) = \dot{y}(t) + \delta \dot{v}(t).
+\]
+Идея: если нашли экстремум, модифицировать функцию каким угодно возмущением не выгодно, а значит, можно минимизировать по $\delta$, то есть:
+\[
+\dfrac{d\left[ \int_{0}^{1} f(y + \delta v; \dot{y} + \delta \dot{v}; t)dt \right]}{d\delta} = 0, \text{ } \forall v.
+\]
+
+Пусть все функции <<хорошие>>, тогда:
+\begin{align*}
+	\int_{0}^{1}& \dfrac{df(\ldots)}{d\delta}dt = 0. \\
+	\int_{0}^{1}& \left(f'_y(y + \delta v; \dot{y} + \delta \dot{v}; t)v + f'_{\dot{y}}(y + \delta v; \dot{y} + \delta \dot{v}; t)\dot{v}\right)dt = 0.
+\end{align*}
+
+Подставим $\delta = 0$:
+\begin{align*}
+	\int_{0}^{1}& \left(f'_y(y; \dot{y}; t)v + f'_{\dot{y}}(y; \dot{y};t)\dot{v}\right)dt = 0.
+\end{align*}
+
+Проинтегрируем второе слагаемое по частям:
+\[
+\int_{0}^{1} f'_{\dot{y}}\dot{v}dt = f'_{\dot{y}}\dot{v} \Bigm|^1_0 - \int_{0}^{1} \dfrac{df'_{\dot{y}}}{dt}vdt.
+\]
+
+Рассмотрим простую задачу с фиксированными краями (функция должна начинаться и заканчиваться в каких-то точках). Возмущение на краях равно 0, поэтому первое слагаемое равно 0. Тогда получаем:
+\begin{align*}
+	\int_{0}^{1} \left(f'_y(y; \dot{y}; t)v -  \dfrac{df'_{\dot{y}}}{dt}v\right)dt &= 0. \\
+	\int_{0}^{1} \left(f'_y(y; \dot{y}; t) -  \dfrac{df'_{\dot{y}}}{dt}\right)vdt &= 0.
+\end{align*}
+
+Так как всё выражение должно быть равно 0 для $\forall \delta$, то выражение в скобках должно быть равно 0. То есть:
+\[
+f'_y = \dfrac{df'_{\dot{y}}}{dt}.
+\]
+Это и есть уравнение Эйлера-Лагранжа.
+
+Пример:
+\begin{align*}
+	&\int_{0}^{\pi} (y^2 - (\dot{y})^2)dt \rightarrow \min_y. \\
+	&y(0) = 1, y(\pi) = \dfrac{1}{2}.
+\end{align*}
+Применяем уравнение Эйлера:
+\begin{align*}
+	2y = \dfrac{d(-2\dot{y})}{dt} &\Rightarrow y + \ddot{y} = 0. \\
+	\lambda^2 + 1 = 0 &\Rightarrow \lambda = \pm i. \\
+	y(t) = a\cos &t + b\sin t.
+\end{align*}
+
+\section{Разное}
 \begin{enumerate}
 	\item Гамма-функция:
 	
 	\tikzset{every picture/.style={line width=0.75pt}} %set default line width to 0.75pt        
-	\begin{center}
+\begin{center}
+		
 	\begin{tikzpicture}[x=0.75pt,y=0.75pt,yscale=-1,xscale=1]
 	%uncomment if require: \path (0,243); %set diagram left start at 0, and has height of 243
 	
@@ -541,8 +1035,48 @@ f(x) = C_1e^{\dfrac{kx^2}{2}}.
 	
 	
 	\end{tikzpicture}
-	\end{center}
+\end{center}
+
+	\item Задачка на пробит.
+	\[
+	y_i = \begin{cases}
+	1, \text{ if } y_i^* > 0, \\
+	0, \text{ if } y_i^* \le 0.
+	\end{cases}
+	\]
+	\[
+	y_i^* = \beta_1 + \beta_2x_i + u_i
+	\]
+	Вопрос: как изменятся коэффициенты, если $u_i$ распределено не $N(0,1)$, а $u_i \sim N(0, 4)$. 
 	
+	Рассмотрим эту модель:
+	\begin{align*}
+	y_i^* &= \beta_1 + \beta_2x_i + u_i, \\
+	u_i &\sim N(0, 4).
+	\end{align*}
+	Поделим левую и правую часть на 2:
+	\[
+	\dfrac{y_i^*}{2} = \dfrac{\beta_1}{2} + \dfrac{\beta_2}{2}x_i + \dfrac{u_i}{2}.
+	\]
+	Переобозначим:
+	\[
+	y_i^* = \tilde{\beta_1} + \tilde{\beta_2}x_i + \tilde{u_i}.
+	\]
+	А это классическая модель с $\tilde{u_i} \sim N(0,1)$. Поэтому ответ: увеличатся в два раза.
+	
+	 \item Как считать сложные интегралы c параметром. 
+	 
+	 Пусть есть интеграл:
+	 \[
+	 \int_{-\infty}^{+\infty}e^{-ax^2}dx = f(a).
+	 \]
+	 Введём единицы измерения. Пусть $x$ измеряется в слонах. Тогда $dx$ тоже измеряется в слонах. Сделаем так, чтобы $f(a)$ тоже измерялось в слонах. Понятно, что тогда $e^{-ax^2}$ должно измеряться <<ни в чём>>. Чтобы это произошло, $a$ должно измеряться в [слонах$^{-2}$]: тогда в степени экспоненты единицы измерения сократятся. А так как $f(a)$ тоже измеряется в слонах, то $f(a)$ должна быть такой, чтобы [слоны$^{-2}$] переходили в [слоны]. Это означает, что $f(a) = c \dfrac{1}{\sqrt{a}}$. В итоге, восстановили интеграл с точностью до константы.
+	 
+	 Другой пример:
+	 \[
+	  \int_{-\infty}^{+\infty}e^{-\frac{x^3}{a}}dx = f(a).
+	 \]
+	 Рассуждения аналогичные. $a$ должна измеряться в [слонах$^{3}$]. Тогда $f(a)$ должна переводить [слонов$^{3}$] в [слоны]. Тогда $f(a) = c\sqrt[3]{a}$.
 \end{enumerate}
 
 \end{document}
