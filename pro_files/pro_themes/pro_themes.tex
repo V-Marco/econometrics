@@ -200,6 +200,17 @@ E(\hat \theta_{n} - \theta) = 0
 
 Также приведите пример, когда выполняется обратное соотношение.
 
+\subsection{}
+
+Дано: \[ y_{i} = \beta_{1} + \beta_{2} \cdot x_{i} + u_{i}\]
+\[v_{i} = \begin{pmatrix}  u_{i} \\ x_{i} \end{pmatrix}; \ E(v_{i}) = \begin{pmatrix}  0 \\ \mu_{x} \end{pmatrix};
+\]
+\[
+Var(v_{i}) = \begin{pmatrix}  \sigma_{u}^2 & c \\
+c & \sigma_{x}^2 \end{pmatrix}
+\]
+
+Найдите $\plim_{n \to \infty} \hat \beta_{2}^{\text{МНК}}$
 
 \subsection{Решения}
 
@@ -302,18 +313,6 @@ $\plim C_n = plim \frac{\sum_{i = 1}^n(x_i - \bar{x})u_i}{\sum_{i = 1}^n(x_i - \
 
 Таким образом, $\plim \hb_2 = \beta_2 - u_1$
 \section{Двухшаговый МНК}
-
-\subsection{}
-
-Дано: \[ y_{i} = \beta_{1} + \beta_{2} \cdot x_{i} + u_{i}\]
-\[v_{i} = \begin{pmatrix}  u_{i} \\ x_{i} \end{pmatrix}; \ E(v_{i}) = \begin{pmatrix}  0 \\ \mu_{x} \end{pmatrix};
-\]
-\[
-Var(v_{i}) = \begin{pmatrix}  \sigma_{u}^2 & c \\
-c & \sigma_{x}^2 \end{pmatrix}
-\]
-
-Найдите $\plim_{n \to \infty} \hat \beta_{2}^{\text{МНК}}$
 
 
 \subsection{Бытовуха}
