@@ -19,6 +19,18 @@ colorlinks=true,
 linkcolor=magenta
 }
 
+\def \hb{\hat{\beta}}
+\def \hs{\hat{s}}
+\def \hy{\hat{y}}
+\def \hY{\hat{Y}}
+\def \he{\hat{\varepsilon}}
+\def \v1{\vec{1}}
+\def \e{\varepsilon}
+\def \z{z}
+\def \hVar{\widehat{\Var}}
+\def \hCorr{\widehat{\Corr}}
+\def \hCov{\widehat{\Cov}}
+
 %%% Дополнительная работа с математикой
 \usepackage{amsmath,amsfonts,amssymb,amsthm,mathtools} % AMS
 \usepackage{icomma} % "Умная" запятая: $0,2$ --- число, $0, 2$ --- перечисление
@@ -42,12 +54,343 @@ linkcolor=magenta
 \let\P\relax
 \DeclareMathOperator{\P}{\mathbb{P}}
 \DeclareMathOperator{\E}{\mathbb{E}}
-
+\DeclareMathOperator{\plim}{plim}
+\DeclareMathOperator{\Var}{Var}
 \begin{document}
 	
 \maketitle
 
 \tableofcontents
+
+\section{Пределы по вероятности}
+\subsection{Разминка}
+Найдите:
+\begin{enumerate}
+	\item $\text{plim} \bar{X}_n$
+	
+	\item $\text{plim} \frac{\sum_{i = 1}^{n}(X_i - \bar{X})^2}{n - 1}$
+	
+	\item Считая, что пары $(x_1, y_1), (x_2, y_2) \dots (x_n, y_n)$ независимы и одинаково распеределены, найдите:
+	
+	$ \text{plim} \frac{\sum_{i = 1}^n(x_i - \bar{x_i})(y_i - \bar{y})}{n - 1}$
+	
+	
+\end{enumerate}
+
+
+
+
+
+\subsection{Задача про русскую народную скромность}
+
+Отчаянный исследователь Эйзенхорн пытается предсказать результаты студентов по эконометрике и строит следующую регрессию:
+\[
+y_i = \beta_1 + \beta_2x_i + u_i
+\]
+
+
+$y_i$ - результат по эконометрике\\
+$x_i$ - количество съеденных бургеров
+
+Для получения данных Эйзенхорн заставил студентов заполнить табличку. Получилось, что регрессор подчиняется следующему утверждению:
+
+\[
+x_i^* = x_i + \alpha + \nu_i
+\]
+
+$\alpha$ - Параметр русской народной скромности\\
+$\nu_i$ - случайная величина, отражающая несовершенство памяти
+
+$E(x_i) = \mu_x, \E(u_i) = 0, \E(\nu_i) = 0, Var(x_i) = \sigma_x^2, Var(u_i) = \sigma_u^2, Var(\nu_i) = \sigma_\nu^2$\\
+
+Найдите:\\
+$\text{plim} \hat{\beta}_2$\\
+$\text{plim} \hat{\beta}_1$
+
+\subsection{Смещённость оценок}
+
+Дети Империума Аида и Саша каждый день покупают айфоны. 
+
+$x_i$ - количество купленных айфонов
+
+$y_i$ - потраченная сумма денег
+
+\[
+y_i = \beta_1 + \beta_2 x_i + u_i
+\]
+
+Они оба записывают в списки количество купленных айфонов.
+
+Аида записывает: $x_i^a = x_i + \nu_i$
+
+Саша записывает: $x_i^s = x_i + \phi_i$
+
+Четвёрки $(x_i, u_i, \nu_i, \phi_i)$ независимы. Величины внутри четвёрок также независимы.
+
+
+$E(x_i) = \mu_x, \E(u_i) = 0, \E(\nu_i) = 0, E(\phi_i) = 0, Var(x_i) = \sigma_x^2, Var(u_i) = \sigma_u^2, Var(\nu_i) = \sigma_\nu^2, Var(\phi_i) = \sigma_\phi^2$
+
+\begin{enumerate}
+	\item $\hat{y}_i = \hb_1^a + \hb_2^ax_i^a$
+	
+	Найдите $plim \hb_2^a$
+	
+	\item $\hat{y}_i = \hb_1^s + \hb_2^sx_i^s$
+	
+	Найдите $plim \hb_2^s$
+	
+	\item Придумайте оценку $\hb_2$, у которой $plim \hb_2 = \beta_2$
+	
+\end{enumerate}
+
+\subsection{}
+$y_i = \beta_1 + \beta_2 x_i + u_i$
+$\E(u_i) = 0$, $Var(u_i)=\sigma^2$, $x_i = i$
+
+Найдите $plim \hb_2$
+
+\subsection{}
+$y_i = \beta_1 + \beta_2 x_i + u_i$
+$\E(u_i) = 0$, $Var(u_i)=\sigma^2$, 
+$x_i = 
+\begin{cases}
+0, \text{ если } i = 1; \\
+1, \text{ если } i > 1; \\
+\end{cases}
+$
+
+Найдите $plim \hb_2$
+
+\subsection{}
+$y_i = \beta_1 + \beta_2 x_i + u_i$
+$\E(u_i) = 0$, $Var(u_i)=2^i\sigma^2$, 
+Чётные $x_i$ равны нулю, нечётные $x_i$ равны единице.
+
+Найдите $plim \hb_2$
+
+\subsection{Гетерогенный эффект воздействия и ошибка специффикации}
+
+Рассмотрим модель $y_{i} = \beta_{i} \cdot x_{i} + \alpha_{i} \cdot w_{i} + \epsilon_{i}$.
+
+Здесь $y_{i}$ -- производительнось труда $i$-го работника; $x_{i}$ -- стаж труда $i$-го работника, $E(x_i)>0$, $0<Var(x_i)<\infty$; $w_{i}$ - бинарная переменная, равная единице, если $i$-ый работник посетил курсы повышения кваллификации, и равная нулю в противном случае; $\alpha_{i}$ - изменение производительности труда $i$-ого работника в результате посещения курсов повышения кваллификации. Обратите внимание, что эффект различен для разных работников, то есть является гетерогенным. $E(\epsilon_{i}|x_{i}, \alpha_{i}, w_{i})=0$, a векторы $v_{1}, \dots, v_{n}$ - независимы и одинаково распределены, где $v_{i}' = (x_{i}, w_{i}, \alpha_{i}, e_{i})$.
+
+Исследователя интересует {\it средний} эффект воздействия курсов повышения кваллификации $\alpha:\ \alpha = E(\alpha_{i})$. В качестве его оценки он использует МНК-оценку коэффициента при переменной $w$ в регрессии: $\hat y = \hat \beta_{i} \cdot x_{i} + \hat \alpha_{i} \cdot w_{i}$.
+
+Обратите внимание, что исследователь игнорирует гетерогенность, мотивируя тем, что его интересует только {\it средний} эффект воздействия.
+
+Дополнительно известно, что в действительности эффект от посещения курсов повышения кваллификации зависит от опыта работника: $\alpha_{i} = \gamma \cdot x_i$, где $\gamma>0$. 
+
+\begin{enumerate}
+	\item  Будет ли оценка, полученная исследователем, состоятельной? Если нет, то можете ли вы определить направление ее асимптотического смещения?
+	\item В предыдущем пункте на кружке получилось доказать только что при $w_{i} = 1: \plim_{n \to \infty} \hat \alpha = 0 < \gamma \cdot E(x_{1})$. Выясните, можно ли подобрать $w_{i}$ так, что $\plim_{n \to \infty} \hat \alpha > \gamma \cdot E(x_{1})$.
+	\item Пусть теперь известно, что $x_{i}$ и $w_{i}$ независимы. Ответьте на вопросы предыдущего пункта.
+\end{enumerate}
+
+\subsection{}
+
+Привести пример, когда одновременно выполняется:
+\[
+\lim_{n \to \infty}
+E(\hat \theta_{n} - \theta) = 0
+\]
+\[
+\plim_{n \to \infty}
+(\hat \theta_{n} - \theta) \neq 0
+\]
+
+Также приведите пример, когда выполняется обратное соотношение.
+
+\subsection{}
+
+Дано: \[ y_{i} = \beta_{1} + \beta_{2} \cdot x_{i} + u_{i}\]
+\[v_{i} = \begin{pmatrix}  u_{i} \\ x_{i} \end{pmatrix}; \ E(v_{i}) = \begin{pmatrix}  0 \\ \mu_{x} \end{pmatrix};
+\]
+\[
+Var(v_{i}) = \begin{pmatrix}  \sigma_{u}^2 & c \\
+c & \sigma_{x}^2 \end{pmatrix}
+\]
+
+Найдите $\plim_{n \to \infty} \hat \beta_{2}^{\text{МНК}}$
+
+\subsection{Решения}
+
+\subsubsection*{Разминка}
+
+\begin{enumerate}
+	\item $\text{plim} \bar{X}_n = E(X_i)$
+	
+	\item $\text{plim} \frac{\sum_{i = 1}^{n}(X_i - \bar{X})^2}{n - 1} = \text{plim} \frac{\sum_{i = 1}^nX_i^2 - n \bar{X}^2}{n - 1} \cdot \frac{n}{n} = \left( \text{plim} \frac{\sum_{i = 1}^n X_i^2 }{n} - \text{plim} \bar{X}^2 \right) \cdot \text{plim}  \frac{n}{n-1} = \E(X_1^2) - \E(X_1)^2 = Var(X_1)$
+	
+	\item $ \text{plim} \frac{\sum_{i = 1}^n(x_i - \bar{x})(y_i - \bar{y})}{n - 1} = \text{plim}\frac{\sum_{i = 1}^n(x_i - \bar{x}y_i)}{n - 1} = \text{plim} \frac{\sum_{i = 1}^n(x_iy_i - \bar{x}y_i)}{n - 1} = \left( \text{plim} \frac{\sum_{i = 1}^nx_iy_i}{n} - \E(x_i)\E(y_i) \right) \cdot \text{plim} \left( \frac{n}{n-1} \right) = \E(XY) - \E(X)\E(Y) = (X, Y)$
+	
+	
+\end{enumerate}
+\subsubsection*{Задача про русскую народную скромность}
+$\text{plim} \hat{\beta}_2 = \frac{\text{plim} \left( \frac{\sum_{i = 1}^n(x_i^* - \bar{x}^*)(y_i - \bar{y})}{n-1} \right)}{\text{plim} \left( \frac{\sum_{i = 1}^n(x_i^* - \bar{x}^*)^2}{n-1}\right)} = \frac{Cov(x_1^*, y_1)}{\Var(x_1^*)} = \frac{{Cov}(x_1 + \alpha + \nu_1, \beta_1 + \beta_2x_1 + \epsilon_1)}{\Var(x_1^*)} = \frac{\beta_2\Var(x_1)}{\Var(x_1^*)} = \frac{\beta_2\Var(x_1)}{\Var(x_1 + \alpha + \nu_1)} = \frac{\beta_2\Var(x_1)}{\Var(x_1) + \Var(\nu_1)} = \frac{\beta_2\sigma_x^2}{\sigma_x^2 + \sigma_\nu^2}$\\
+
+Выводы:
+
+\begin{enumerate}
+	\item Оценки занижаются, $\text{plim} \hat{\beta_2} \neq \beta_2$
+	\item $\alpha$  не влияет на смещение
+	\item При $\sigma_\nu^2 = 0$ (все студенты идеально помнят свои $x_i$, и просто занижают из-за русской национальной скромности) $\Rightarrow$ $\text{plim}\hat{\beta_2} = \beta_2$
+\end{enumerate}
+
+$\plim \hat{\beta}_1 = \plim (\bar{y} - \hat{\beta}_2\bar{x}) = \plim \bar{y} - \plim \hat{\beta}_2 \cdot \plim \bar{x} = \plim \left( \frac{\sum_{i = 1}^n \beta_1 + \beta_2 x_i + \epsilon_i}{n} \right) - \beta_2 \frac{\beta_2\sigma_x^2}{\sigma_x^2 + \sigma_\nu^2} \mu_x = \plim (\beta_1 + \beta_2\bar{x} + \bar{\epsilon}) -  \beta_2 \frac{\beta_2\sigma_x^2}{\sigma_x^2 + \sigma_\nu^2} \mu_x  = \beta_1 + \beta_2 \mu_x -  \beta_2 \frac{\beta_2\sigma_x^2}{\sigma_x^2 + \sigma_\nu^2} \mu_x = \beta_1 + \frac{\beta_2 \mu_x (\sigma_x^2 + \sigma_v^2) - \beta \sigma_x^2 \mu_x}{\sigma_x^2 + \sigma_\nu^2} = \beta_1 + \frac{\beta_2 \mu_x \sigma_\nu^2}{\sigma_x^2 + \sigma_\nu^2}$
+
+\subsubsection*{Смещённость оценок}
+
+\begin{enumerate}
+	\item $\plim \hb_2^a = \beta_2 \frac{\beta_2\sigma_x^2}{\sigma_x^2 + \sigma_\nu^2}$ где $\sigma_x^2 + \sigma_\nu^2 = \Var(x_1^a)$
+	
+	\item $\plim \hb_2^s = \beta_2 \frac{\beta_2\sigma_x^2}{\sigma_x^2 + \sigma_\phi^2}$ где $\sigma_x^2 + \sigma_\phi^2 = \Var(x_1^s)$
+	
+	\item $\plim \frac{\sum_{i = 1}^n(x_i^s - \bar{x}^s)(x_i^a - \bar{x}^a)}{n - 1} = \sigma_x^2$ 
+	
+	$\plim \frac{\sum_{i = 1}^n(x_i^a - \bar{x}^a)^2}{n - 1}  = \Var(x_1^a) = \sigma_x^2 + \sigma_\nu^2$
+	
+	$\plim \hb_2^a = \plim \frac{\sum_{i = 1}^n(x_i^a - \bar{x}^a)(y_i - \bar{x}^a)}{\sum_{i = 1}^n(x_i^a - \bar{x}^a)^2} = \beta_2 \frac{\beta_2\sigma_x^2}{\sigma_x^2 + \sigma_\nu^2}$
+	
+	$\hb_2 = \hb_2^a \frac{\sum_{i = 1}^n(x_i^a - \bar{x}^a)^2 / (n - 1)}{\sum_{i = 1}^n(x_i^a - \bar{x}^a)(x_i^s - \bar{x}^s) / (n - 1)} = \frac{\sum_{i = 1}^n(x_i^a - \bar{x}^a)(y_i - \bar{y})}{\sum_{i = 1}^n(x_i^a - \bar{x}^a)(x_I^s - \bar{x}^s)} = \beta_2^*$
+	
+	$\plim \beta_2^* = \beta_2$
+	
+	Другая оценка:
+	
+	$\beta_2^{**} = \frac{\sum_{i = 1}^n(x_i^s - \bar{x}^s)(y_i - \bar{y})}{\sum_{i = 1}^n(x_i^a - \bar{x}^a)(x_I^s - \bar{x}^s)}$
+	
+	$\plim \beta_2^{**} = \beta_2$
+	
+	Ещё одна оценка:
+	
+	$\beta_2^{***} = \beta_2^{**} \frac{n}{n-1}$
+	
+\end{enumerate}
+
+\subsubsection*{1.4}
+
+$\plim \frac{\sum_{i = 1}^n(x_i - \bar{x})y_i}{\sum_{i = 1}^n(x_i - \bar{x})^2}$
+
+Подставим в это выражение $y_i = \beta_1 + \beta_2x_i + u_i$. Получим сумму в из трёх слагаемых. Рассмотрим каждое в отдельности.
+
+\begin{enumerate}
+	\item $\frac{\sum_{i = 1}^n(x_i - \bar{x})\beta_1}{\sum_{i = 1}^n(x_i - \bar{x})^2} = \beta_1 \frac{\sum_{i = 1}^n(x_i - \bar{x})}{\sum_{i = 1}^n(x_i - \bar{x})^2} = \frac{0}{\sum_{i = 1}^n(x_i - \bar{x})^2} = 0$
+	
+	\item $\frac{\sum_{i = 1}^n(x_i - \bar{x})\beta_2x_i}{\sum_{i = 1}^n(x_i - \bar{x})^2} = \beta_2 \frac{\sum_{i = 1}^n x_i^2 - x_i\bar{x}}{\sum_{i = 1}^n(x_i - \bar{x})^2} = \beta_2$
+	
+	\item Подсчёт третьей части затруднён так как есть случайная составляющая. Законом Больших чисел мы также не можему воспользоваться. Однако есть другой способ. 
+	
+	Пусть $\E(R_n) \to \mu, \Var(R_n) \to 0$
+	
+	Тогда согласно неравенству Чебышёва $P(|R_n - \mu| > \epsilon) \to 0$. То есть, если мы докажем что дисперсия этого слагаемого стремится к нулю, то предел по вероятности будет равен математическому ожиданию.
+	
+	Обозначим третье слагаемое как $C_n$
+	
+	$C_n = \frac{\sum_{i = 1}^n(x_i - \bar{x})u_i}{\sum_{i = 1}^n(x_i - \bar{x})^2}$
+	
+	$\E(C_n) = 0$
+	
+	$\Var(C_n) =  \frac{\sum_{i = 1}^n(x_i - \bar{x})^2 \sigma_u^2}{\sum_{i = 1}^n((x_i - \bar{x})^2)^2} = \frac{\sigma_u^2}{\sum_{i = 1}^n(x_i - \bar{x})^2} = \frac{\sigma_u^2}{\sum_{i = 1}^n x_i^2 - n\bar{x}^2} = \frac{\sigma_u^2}{\sum_{i = 1}^n i^2 - n \left( \frac{\sum_{i = 1}^n i}{n} \right)^2}$
+	
+	Далее было объяснение почему эта штука в знаменателе равна нулю. Нужен график, позже отрисую.
+	
+	Следовательно, $\plim \hb_2 = \beta_2$
+	
+	
+\end{enumerate}
+
+\subsubsection*{1.5}
+Аналогично считаем, что  $\plim \frac{\sum_{i = 1}^n(x_i - \bar{x})y_i}{\sum_{i = 1}^n(x_i - \bar{x})^2} = \plim A_n + \plim B_n + \plim C_n$
+
+Помня, что $x_1 - \bar{x} = -\frac{n - 1}{n}$, и что $x_2 - \bar{x} = \frac{1}{n}$ вычислим $\sum_{i = 1}^n (x_i - \bar{x})^2$:
+
+$ \left( -\frac{n-1}{n} \right)^2 + \sum_{i = 1}^n \frac{1}{n^2} = \left( -\frac{n-1}{n} \right)^2 + \frac{n-1}{n} = \frac{n-1}{n^2}(n - 1 + 1)  = \frac{n - 1}{n}$
+
+Теперь можно вычислить $\plim C_n$
+
+$\plim C_n = plim \frac{\sum_{i = 1}^n(x_i - \bar{x})u_i}{\sum_{i = 1}^n(x_i - \bar{x})^2} = 
+\plim \frac{-\frac{n - 1}{n}u_1}{\frac{n-1}{n}} + \plim \frac{\frac{1}{n}\sum_{i = 1}^nu_i}{\frac{n - 1}{n}} = -\plim u_1 + 0 = -u_1$
+
+Таким образом, $\plim \hb_2 = \beta_2 - u_1$
+\section{Двухшаговый МНК}
+
+
+\subsection{Бытовуха}
+
+Шаг 1: Оценим модель
+\[
+\hat{x}_i = \hat{\alpha}_1 + \hat{\alpha}_1 z_i
+\]
+
+Шаг 2: Оценим модель
+
+\[
+\hat{y}_i = \hb_1 + \hb_2 \hat{x}_i
+\]
+
+\[
+v_{i} = \begin{pmatrix}  u_{i} \\ x_{i} \\  z_{i} \end{pmatrix}; \ E(v_{i}) = \begin{pmatrix}  0 \\ \mu_{x} \\ \mu_{z} \end{pmatrix};
+\]
+
+\[
+Var(v_{i}) = \begin{pmatrix}  \sigma_{u}^2 & c & 0 \\
+c & \sigma_{x}^2  & d \\
+0 & d  & \sigma_z^2 \end{pmatrix}
+\]
+
+Найдите $\plim_{n \to \infty} \hat \beta_{2}, \plim_{n \to \infty} \hat \beta_{1}$
+
+Хинт: Полученная оценка $\hat \beta_{2}$ будет в итоге оценкой метода инструментальных переменных.
+
+
+\subsection{Бытовуха, версия хардкор}
+
+Рассматривается модель: 
+\[
+\theta_1 + \theta_2 x_i + u_i
+\]
+где $x_i$ стохастический эндогенный
+регрессор:
+
+\[
+x_i = \alpha_0 + \alpha_1 p_i + \alpha_2 q_i + \epsilon_i
+\]
+
+
+\[
+v_{i} = \begin{pmatrix}  u_{i} \\ x_{i} \\  p_{i} \\ q_{i}  \\ \epsilon_{i} \end{pmatrix}; \ E(v_{i}) = \begin{pmatrix}  0 \\ \mu_{x} \\ \mu_{p} \\ \mu_{q} \\ 0\end{pmatrix};
+\]
+
+\[
+Var(v_{i}) = \begin{pmatrix}  \sigma_{u}^2 & C_{xu} & 0 & 0 & 0\\
+C_{xu} & \sigma_{x}^2  & C_{px} & C_{qx} & 0\\
+0 & C_{px} & \sigma_p^2 & C_{pq}  & 0\\
+0 & C_{qx} & C_{pq} & \sigma_q^2 & 0 \\
+0 & 0 & 0 & 0 & \sigma_\epsilon^2\end{pmatrix}
+\]
+
+Шаг 1: Оценим модель
+\[
+\hat{x}_i = \hat{\alpha}_0 + \hat{\alpha}_1 p_i + \hat{\alpha}_2 q_i
+\]
+
+Шаг 2: Оценим модель
+
+\[
+\hat{y}_i = \hat{\theta}_1 + \hat{\theta}_2 \hat{x}_i
+\]
+
+\begin{enumerate}
+	\item  Найдите $\plim_{n \to \infty} \hat \theta_{2}, \plim_{n \to \infty} \hat \theta_{1}$  и проверьте состоятельность этих оценок.
+	
+	\item Пусть ваша выборка состоит из 1000 наблюдений, причем вы располагаете данными о средних выборочных значениях переменных:
+	
+	$\bar{X} = \bar{Y} = \bar{P} = 0, \ \bar{Q} = \bar{PQ} = \bar{XQ} = \bar{P^2} = \bar{YQ} = 1, \ \bar{Q^2} = 1.5, \ \bar{XP} = \bar{YP} = 2$
+	
+	Вычислите состоятельную оценку параметра $\theta_2$ из предыдущего пункта.
+\end{enumerate}
+
+
 
 \section{Идеи распределений}
 
